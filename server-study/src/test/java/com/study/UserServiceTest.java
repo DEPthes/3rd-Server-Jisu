@@ -1,7 +1,7 @@
 package com.study;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.study.domain.user.domain.User;
 import com.study.domain.user.domain.repository.UserRepository;
@@ -16,15 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-// JUniit5와 Mockito를 연동하기 위해
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;    // 가짜 객체 생성
+    private UserRepository userRepository;
 
     @InjectMocks
-    private UserService userService;   // 가짜 객체 주입
+    private UserService userService;
 
     private User testUser;
 
@@ -41,10 +40,8 @@ public class UserServiceTest {
     public void testCreateUser() {
         // Given
         when(userRepository.save(testUser)).thenReturn(testUser);
-
         // When
-        User addedUser = userService.addUser(testUser);
-
+        User addedUser = userService.registerUser(testUser);
         // Then
         assertEquals(testUser.getName(), addedUser.getName());
         assertEquals(testUser.getEmail(), addedUser.getEmail());
@@ -55,13 +52,21 @@ public class UserServiceTest {
     public void testGetUserById() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-
         // When
         User retrievedUser = userService.getUserById(1L);
-
         // Then
         assertEquals(testUser.getId(), retrievedUser.getId());
         assertEquals(testUser.getName(), retrievedUser.getName());
         assertEquals(testUser.getEmail(), retrievedUser.getEmail());
+    }
+
+    @DisplayName("사용자 삭제 테스트")
+    @Test
+    public void testDeleteUser() {
+        // Given
+        // When
+        userService.deleteUser(testUser);
+        // Then
+        verify(userRepository, times(1)).delete(testUser);
     }
 }
